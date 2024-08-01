@@ -6,24 +6,26 @@ fullnameOverride: ""
 
 ## Enable or disable Milvus Cluster mode
 cluster:
-  enabled: true
+  enabled: false
 
 image:
   all:
-    repository: milvusdb/milvus
+    repository: registry.godscode.com.cn/gtja/public/milvus
     tag: v2.4.6
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
     ## Secrets must be manually created in the namespace.
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
     ##
-    # pullSecrets:
-    #   - myRegistryKeySecretName
+    pullSecrets:
+      - regcred
   tools:
-    repository: milvusdb/milvus-config-tool
+    # registry: registry.godscode.com.cn
+    repository: registry.godscode.com.cn/gtja/public/milvus-config-tool
     tag: v0.1.2
     pullPolicy: IfNotPresent
-
+    pullSecrets:
+      - regcred
 # Global node selector
 # If set, this will apply to all milvus components
 # Individual components can be set to a different node selector
@@ -503,10 +505,13 @@ attu:
 minio:
   enabled: true
   name: minio
-  mode: distributed
+  mode: standalone
   image:
+    repository: "registry.godscode.com.cn/gtja/public/minio"
     tag: "RELEASE.2023-03-20T20-16-18Z"
     pullPolicy: IfNotPresent
+  imagePullSecrets:
+  - name: regcred
   accessKey: minioadmin
   secretKey: minioadmin
   existingSecret: ""
@@ -564,14 +569,16 @@ minio:
 etcd:
   enabled: true
   name: etcd
-  replicaCount: 3
+  replicaCount: 1
   pdb:
     create: false
   image:
-    repository: "milvusdb/etcd"
+    registry: "registry.godscode.com.cn"
+    repository: "gtja/public/milvusdb/etcd"
     tag: "3.5.5-r4"
     pullPolicy: IfNotPresent
-
+    pullSecrets:
+      - regcred
   service:
     type: ClusterIP
     port: 2379
@@ -618,7 +625,7 @@ etcd:
 ##
 
 pulsar:
-  enabled: true
+  enabled: false
   name: pulsar
 
   fullnameOverride: ""
@@ -681,9 +688,9 @@ pulsar:
 
   zookeeper:
     resources:
-      requests:
-        memory: 1024Mi
-        cpu: 0.3
+      # requests:
+      #   memory: 1024Mi
+      #   cpu: 0.3
     configData:
       PULSAR_MEM: >
         -Xms1024m
@@ -710,9 +717,9 @@ pulsar:
         name: ledgers
         size: 200Gi
     resources:
-      requests:
-        memory: 2048Mi
-        cpu: 1
+      # requests:
+      #   memory: 2048Mi
+      #   cpu: 1
     configData:
       PULSAR_MEM: >
         -Xms4096m
@@ -743,9 +750,9 @@ pulsar:
       enabled: false
     replicaCount: 1
     resources:
-      requests:
-        memory: 4096Mi
-        cpu: 1.5
+      # requests:
+      #   memory: 4096Mi
+      #   cpu: 1.5
     configData:
       PULSAR_MEM: >
         -Xms4096m
@@ -775,18 +782,18 @@ pulsar:
 
   autorecovery:
     resources:
-      requests:
-        memory: 512Mi
-        cpu: 1
+      # requests:
+      #   memory: 512Mi
+      #   cpu: 1
 
   proxy:
     replicaCount: 1
     podMonitor:
       enabled: false
     resources:
-      requests:
-        memory: 2048Mi
-        cpu: 1
+      # requests:
+      #   memory: 2048Mi
+      #   cpu: 1
     service:
       type: ClusterIP
     ports:
